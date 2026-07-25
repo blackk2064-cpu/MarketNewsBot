@@ -1,8 +1,7 @@
-from ai import analyze_news
+import os
+from google import genai
 
-result = analyze_news(
-    "Federal Reserve keeps interest rates unchanged",
-    "https://example.com"
-)
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
-print(result)
+for model in client.models.list():
+    print(model.name)
