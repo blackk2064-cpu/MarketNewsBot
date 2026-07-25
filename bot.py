@@ -1,24 +1,22 @@
 import os
-import requests
+import feedparser
+from telegram import Bot
 
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-message = """
-📈 أخبار الأسواق العالمية
+bot = Bot(token=TOKEN)
 
-🇺🇸 مؤشر S&P 500 يتحرك بعد صدور بيانات اقتصادية جديدة.
+feeds = [
+    "https://www.forexlive.com/feed/",
+    "https://www.investing.com/rss/news.rss",
+]
 
-💵 الدولار يشهد تغيرات أمام العملات الرئيسية.
+message = "📈 أهم أخبار الأسواق العالمية\n\n"
 
-🪙 بيتكوين تواصل جذب اهتمام المستثمرين.
+for feed in feeds:
+    data = feedparser.parse(feed)
+    for item in data.entries[:3]:
+        message += f"• {item.title}\n{item.link}\n\n"
 
-#الأسواق_العالمية #تداول #اقتصاد
-"""
-
-url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-
-requests.post(url, data={
-    "chat_id": CHAT_ID,
-    "text": message
-})
+bot.send_message(chat_id=CHAT_ID, text=message)
