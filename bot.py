@@ -30,6 +30,7 @@ KEYWORDS = [
     "eur",
     "forex",
     "stock",
+    "stocks",
     "nasdaq",
     "dow",
     "s&p",
@@ -51,16 +52,18 @@ for item in news:
 
     title = item["title"].lower()
 
-    if not any(k in title for k in KEYWORDS):
+    if not any(keyword in title for keyword in KEYWORDS):
         print("تم تجاهل الخبر:", item["title"])
         continue
 
     print("خبر مهم:", item["title"])
 
     try:
+
         print("إرسال إلى Gemini...")
 
         text = analyze_news(item["title"], item["link"])
+
         text = clean_text(text)
 
         print("إرسال إلى تيليجرام...")
@@ -79,16 +82,43 @@ for item in news:
             print("✅ تم الإرسال")
             mark_posted(item["link"])
             break
+
         else:
             print("❌ فشل الإرسال")
-            break
 
     except Exception as e:
+
         print("حدث خطأ:", e)
 
-        # إذا انتهت حصة Gemini لا تكمل بقية الأخبار
+        # إذا انتهت حصة Gemini
         if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-            print("انتهت حصة Gemini، سيتم إيقاف البوت.")
+
+            print("انتهت حصة Gemini، سيتم إرسال الخبر بدون تحليل.")
+
+            text = f"""🚨 {item['title']}
+
+🔗 المصدر:
+{item['link']}
+
+⚠️ تعذر إنشاء التحليل بسبب انتهاء الحصة اليومية لـ Gemini.
+"""
+
+            response = requests.post(
+                API,
+                data={
+                    "chat_id": CHAT_ID,
+                    "text": text,
+                },
+            )
+
+            print(response.text)
+
+            if response.json().get("ok"):
+                print("✅ تم إرسال الخبر بدون تحليل")
+                mark_posted(item["link"])
+
             break
 
-        break
+        else:
+            print("❌ خطأ غير معروف")
+            break
