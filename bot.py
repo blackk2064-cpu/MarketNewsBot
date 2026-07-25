@@ -1,25 +1,34 @@
 import os
-import feedparser
 import requests
+
+from news import get_news
+from ai import analyze_news
+from storage import is_posted, mark_posted
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-feeds = [
-    "https://www.forexlive.com/feed/",
-]
+API = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 
-message = "📈 اختبار البوت"
+news = get_news()
 
-url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+for item in news:
+    if is_posted(item["link"]):
+        continue
 
-response = requests.post(
-    url,
-    data={
-        "chat_id": CHAT_ID,
-        "text": message,
-    },
-)
+    try:
+        text = analyze_news(item["title"], item["link"])
 
-print(response.status_code)
-print(response.text)
+        requests.post(
+            API,
+            data={
+                "chat_id": CHAT_ID,
+                "text": text
+            }
+        )
+
+        mark_posted(item["link"])
+        break
+
+    except Exception as e:
+        print(e)
