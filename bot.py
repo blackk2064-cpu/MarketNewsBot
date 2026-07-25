@@ -63,7 +63,6 @@ for item in news:
         print("إرسال إلى Gemini...")
 
         text = analyze_news(item["title"], item["link"])
-
         text = clean_text(text)
 
         print("إرسال إلى تيليجرام...")
@@ -82,7 +81,6 @@ for item in news:
             print("✅ تم الإرسال")
             mark_posted(item["link"])
             break
-
         else:
             print("❌ فشل الإرسال")
 
@@ -95,12 +93,16 @@ for item in news:
 
             print("انتهت حصة Gemini، سيتم إرسال الخبر بدون تحليل.")
 
-            text = f"""🚨 {item['title']}
+            text = f"""🚨 خبر اقتصادي جديد
 
-🔗 المصدر:
+📰 {item['title']}
+
+📌 تم رصد هذا الخبر ضمن أهم الأخبار الاقتصادية العالمية.
+
+🔗 اقرأ الخبر كاملاً:
 {item['link']}
 
-⚠️ تعذر إنشاء التحليل بسبب انتهاء الحصة اليومية لـ Gemini.
+📊 سيتم توفير التحليل الاقتصادي فور عودة خدمة الذكاء الاصطناعي.
 """
 
             response = requests.post(
@@ -122,3 +124,4 @@ for item in news:
         else:
             print("❌ خطأ غير معروف")
             break
+``
