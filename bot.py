@@ -124,4 +124,4 @@ for item in news:
         else:
             print("❌ خطأ غير معروف")
             break
-``
+
