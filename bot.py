@@ -1,17 +1,29 @@
-import os
-import requests
+news = get_news()
 
-TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
-CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+print(f"عدد الأخبار: {len(news)}")
 
-url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+for item in news:
+    print(item["title"])
 
-response = requests.post(
-    url,
-    data={
-        "chat_id": CHAT_ID,
-        "text": "✅ اختبار: البوت يعمل من GitHub Actions."
-    }
-)
+    if is_posted(item["link"]):
+        print("تم نشره سابقًا")
+        continue
 
-print(response.text)
+    print("إرسال إلى Gemini...")
+
+    text = analyze_news(item["title"], item["link"])
+
+    print("إرسال إلى تيليجرام...")
+
+    response = requests.post(
+        API,
+        data={
+            "chat_id": CHAT_ID,
+            "text": text
+        }
+    )
+
+    print(response.text)
+
+    mark_posted(item["link"])
+    break
