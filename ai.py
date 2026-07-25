@@ -35,44 +35,11 @@ def analyze_news(title, link):
 🛢 النفط:
 
 ⭐ أهمية الخبر:
-اكتبها بهذا الشكل فقط:
+اكتبها بهذا الشكل:
 7/10
 
 💡 ماذا يعني ذلك للمستثمر؟
 اكتب جملة واحدة فقط.
-
-عنوان الخبر:
-{title}
-
-رابط الخبر:
-{link}
-"""
-
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt,
-    )
-
-    return response.text⭐ أهمية الخبر:
-اكتبها بهذا الشكل فقط:
-7/10
-
-💡 ماذا يعني ذلك للمستثمر؟
-اكتب جملة واحدة فقط.
-
-عنوان الخبر:
-{title}
-
-رابط الخبر:
-{link}
-"""
-
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt,
-    )
-
-    return response.text(جملة واحدة)
 
 عنوان الخبر:
 {title}
