@@ -35,7 +35,6 @@ def analyze_news(title, link):
 🛢 النفط:
 
 ⭐ أهمية الخبر:
-اكتبها بهذا الشكل:
 7/10
 
 💡 ماذا يعني ذلك للمستثمر؟
@@ -49,7 +48,7 @@ def analyze_news(title, link):
 """
 
     response = client.models.generate_content(
-        model="gemini-3.6-flash",
+        model="gemini-2.5-flash-lite",
         contents=prompt,
     )
 
