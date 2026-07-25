@@ -1,39 +1,68 @@
 import os
+import re
 import requests
 
 from news import get_news
 from ai import analyze_news
 from storage import is_posted, mark_posted
-from filters import KEYWORDS
 
 TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
 API = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
 
+
+def clean_text(text):
+    text = re.sub(r"[*_`\[\]()~>#]", "", text)
+    return text
+
+
+KEYWORDS = [
+    "gold",
+    "oil",
+    "bitcoin",
+    "crypto",
+    "fed",
+    "inflation",
+    "interest",
+    "rate",
+    "usd",
+    "eur",
+    "forex",
+    "stock",
+    "nasdaq",
+    "dow",
+    "s&p",
+    "trump",
+    "iran",
+    "china",
+    "tariff",
+]
+
+
 news = get_news()
 
 print(f"عدد الأخبار: {len(news)}")
 
 for item in news:
-    title = item["title"]
 
-    # تجاهل الأخبار غير المهمة
-    if not any(keyword.lower() in title.lower() for keyword in KEYWORDS):
-        print(f"تم تجاهل الخبر: {title}")
-        continue
-
-    print(f"خبر مهم: {title}")
-
-    # تجاهل الأخبار المنشورة سابقًا
     if is_posted(item["link"]):
-        print("تم نشره سابقًا")
         continue
+
+    title = item["title"].lower()
+
+    if not any(k in title for k in KEYWORDS):
+        print("تم تجاهل الخبر:", item["title"])
+        continue
+
+    print("خبر مهم:", item["title"])
 
     try:
         print("إرسال إلى Gemini...")
 
         text = analyze_news(item["title"], item["link"])
+
+        text = clean_text(text)
 
         print("إرسال إلى تيليجرام...")
 
@@ -42,19 +71,17 @@ for item in news:
             data={
                 "chat_id": CHAT_ID,
                 "text": text,
-                "parse_mode": "Markdown"
-            }
+            },
         )
 
         print(response.text)
 
-        if response.status_code == 200:
+        if response.json().get("ok"):
+            print("✅ تم الإرسال")
             mark_posted(item["link"])
-            print("✅ تم نشر الخبر بنجاح")
             break
         else:
-            print("❌ فشل إرسال الرسالة")
-            print(response.text)
+            print("❌ فشل الإرسال")
 
     except Exception as e:
-        print(f"حدث خطأ: {e}")
+        print("حدث خطأ:", e)
