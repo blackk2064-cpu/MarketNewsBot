@@ -61,7 +61,6 @@ for item in news:
         print("إرسال إلى Gemini...")
 
         text = analyze_news(item["title"], item["link"])
-
         text = clean_text(text)
 
         print("إرسال إلى تيليجرام...")
@@ -82,6 +81,14 @@ for item in news:
             break
         else:
             print("❌ فشل الإرسال")
+            break
 
     except Exception as e:
         print("حدث خطأ:", e)
+
+        # إذا انتهت حصة Gemini لا تكمل بقية الأخبار
+        if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+            print("انتهت حصة Gemini، سيتم إيقاف البوت.")
+            break
+
+        break
