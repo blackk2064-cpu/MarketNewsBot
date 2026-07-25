@@ -1,3 +1,15 @@
+import os
+import requests
+
+from news import get_news
+from ai import analyze_news
+from storage import is_posted, mark_posted
+
+TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
+
+API = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+
 news = get_news()
 
 print(f"عدد الأخبار: {len(news)}")
